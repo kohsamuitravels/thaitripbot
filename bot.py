@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# מקבל את ה-API Key מהסביבה (לא מ-config.py יותר!)
+# מקבל את ה-API Key מהסביבה
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/", methods=["GET"])
@@ -29,4 +29,5 @@ def chat():
     return jsonify({"reply": bot_reply})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.getenv("PORT", 5000))  # הגדרת הפורט לפי מה ש-Render מחפש
+    app.run(host="0.0.0.0", port=port)
