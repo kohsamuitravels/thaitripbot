@@ -13,21 +13,26 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("message", "")
+    try:
+        user_input = request.json.get("message", "")
 
-    if not user_input:
-        return jsonify({"error": "נא לספק הודעה"}), 400
+        if not user_input:
+            return jsonify({"error": "נא לספק הודעה"}), 400
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "system", "content": "אתה עוזר אישי שמתכנן טיולים בתאילנד"},
-                  {"role": "user", "content": user_input}]
-    )
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "אתה עוזר אישי שמתכנן טיולים בתאילנד"},
+                {"role": "user", "content": user_input}
+            ]
+        )
 
-    bot_reply = response["choices"][0]["message"]["content"]
+        bot_reply = response.choices[0].message.content  # **תיקון קריאת הנתונים**
+        return jsonify({"reply": bot_reply})
 
-    return jsonify({"reply": bot_reply})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))  # הגדרת הפורט לפי מה ש-Render מחפש
+    port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
